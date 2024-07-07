@@ -1,7 +1,6 @@
-const http = require('http');
 const fs = require('fs');
 
-const server = http.createServer((req, res) => {
+const requesHandler = (req, res) => {
     const url = req.url;
     const method = req.method;
     if (url === '/') {
@@ -21,10 +20,12 @@ const server = http.createServer((req, res) => {
         return req.on('end', () => {
             const parsedBody = Buffer.concat(body).toString();
             const message = parsedBody.split('=')[1]
-            fs.writeFileSync('message.txt', message)
-            res.statusCode = 302;
-            res.setHeader('Location', '/');
-            return res.end();
+            fs.writeFileSync('message.txt', message, (err) => {
+                res.statusCode = 302;
+                res.setHeader('Location', '/');
+                return res.end();
+            })
+
         })
 
         // fs.writeFileSync('message.txt', 'DUMMY');
@@ -35,6 +36,15 @@ const server = http.createServer((req, res) => {
     res.write('<body><h1>Hello from my Node.js Server!</h1></body>');
     res.write('</html>');
     res.end();
-});
+}
 
-server.listen(8000);
+module.exports = requesHandler
+
+
+// module.exports = {
+//     handler: requesHandler,
+//     someText: 'Some hard coded text'
+// }
+
+// module.exports.handler = requesHandler;
+// module.exports.someText = 'Some hard coded text';
